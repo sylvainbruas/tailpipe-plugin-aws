@@ -11,6 +11,8 @@ Using this source, you can collect, filter, and analyze logs stored in S3 bucket
 
 Most AWS tables define a default `file_layout` for the `aws_s3_bucket` source, so if your AWS logs are stored in default log locations, you don't need to override the `file_layout` argument.
 
+The trailing `/` is not automatically included in the `prefix`. If your log path requires it, be sure to add it explicitly.
+
 ## Example Configurations
 
 ### Collect CloudTrail logs
@@ -58,6 +60,20 @@ partition "aws_cloudtrail_log" "my_logs_custom_path" {
 }
 ```
 
+### Collect S3 access logs for a specific date from non-date based partition logs
+
+Collect logs in an S3 bucket stored with [non-date based partitioning](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ServerLogs.html) using a prefix to only retrieve files for a specific day.
+
+```hcl
+partition "aws_s3_server_access_log" "my_s3_logs" {
+  source "aws_s3_bucket" {
+    connection = connection.aws.logging_account
+    bucket     = "aws-s3-server-access-logs"
+    prefix     = "2025-06-07"
+  }
+}
+```
+
 ## Arguments
 
 | Argument     | Type            | Required | Default                  | Description                                                                                                                   |
@@ -77,6 +93,7 @@ The following tables define their own default values for certain source argument
 - **[aws_guardduty_finding](https://hub.tailpipe.io/plugins/turbot/aws/tables/aws_guardduty_finding#aws_s3_bucket)**
 - **[aws_nlb_access_log](https://hub.tailpipe.io/plugins/turbot/aws/tables/aws_nlb_access_log#aws_s3_bucket)**
 - **[aws_s3_server_access_log](https://hub.tailpipe.io/plugins/turbot/aws/tables/aws_s3_server_access_log#aws_s3_bucket)**
+- **[aws_securityhub_finding](https://hub.tailpipe.io/plugins/turbot/aws/tables/aws_securityhub_finding#aws_s3_bucket)**
 - **[aws_cost_and_usage_focus](https://hub.tailpipe.io/plugins/turbot/aws/tables/aws_cost_and_usage_focus#aws_s3_bucket)**
 - **[aws_cost_and_usage_report](https://hub.tailpipe.io/plugins/turbot/aws/tables/aws_cost_and_usage_report#aws_s3_bucket)**
 - **[aws_cost_optimization_recommendation](https://hub.tailpipe.io/plugins/turbot/aws/tables/aws_cost_optimization_recommendation#aws_s3_bucket)**
